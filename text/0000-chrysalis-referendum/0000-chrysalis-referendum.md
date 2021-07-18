@@ -28,13 +28,15 @@ A referendum has 4 different stats
 
 ### Upcomming
 
-Any referendum will start here. The question and all answer options are set and final. Also, the start of the referendum, the start of the holding phase and the end of the referendum are set. Each referendum has a unique 256-bit hash as a unique identifier, which can be used to share the vote.
+Any referendum will start here. The creator specifies the question and all answer options, as well as beginning, start of the holding phase and end of the referendum. A ID is created by hashing the entire referendum data, therefore the same combination always results in the same ID.
 
-Referenda are neither automatically added to all nodes, nor are they broadcasted on the network. Instead, any node might give its users (or the owner only) the option to manually add referenda to track. Therefore the creation of a referendum should set the start of a vote at least a few days into the future and make sure there are enough nodes that tally up the votes. Referenda can only be added to nodes during this phase.
+Referenda are neither automatically added to all nodes, nor are they broadcasted on the network. Instead, the referendum must be added to multiple nodes manually. Because submitting the same referendum to multiple nodes always results in the same ID, it is possible to compare data of multiple nodes. This also provides security, as users can verify they are actually voting for the correct referendum (e.g. because the ID is published on Github).
+
+As a result, the creator of a referendum should set the voting start at least a few days into the future and make sure there are enough nodes that track it. Referenda can only be added to nodes during this phase.
 
 ### Commencing
 
-Once the starting milestone defined in the referendum has been reached, the referendum enters the commencing phase. During this phase, votes can already be cast and are recorded by the node, which constantly updates the number of tokens voting for every option whenever a milestone comes in. However, they have no weight yet.
+Once the starting milestone defined in the referendum has been reached, the referendum enters the commencing phase. During this phase, referenda can already be cast and are recorded by the node, which constantly updates the number of tokens voting for every option whenever a milestone comes in. However, they have no weight yet.
 
 Whatever time is set as the beginning, there will always be a place where it will be at a very inconvenient time (e.g. the middle of the night). This phase grants fairness to every timezone, as it does not matter when in this phase you submit your vote. Also, it can be used to draw public attention and spread the word. Ideally, this phase should last for a few days or even a week so everyone has a chance to give his vote 100% of its weight.
 
@@ -60,7 +62,7 @@ Once the end milestone has been received and the total counters have been update
 
 ## Referendum format
 
-Users can submit votes to any nodes that allow it. A referendum consists out of the question and multiple options to choose from, as well as 3 milestones, where the referendum starts, when holding starts and when it is over. There is also a number on how many options may be chosen, which allows multiple-choice votes if >1. Last but not least there is a description field that might contain additional data
+Users can submit referenda to any nodes that allow it. A referendum consists out of the question and multiple options to choose from, as well as 3 milestones, where the referendum starts, when holding starts and when it is over. There is also a number on how many options may be chosen, which allows multiple-choice votes if >1. Last but not least there is a description field that might contain additional data
 
 ### Detailed format
 
@@ -291,7 +293,7 @@ If a singular vote fails, others are unaffected. For example, if one vote is for
 
 # Rationale and alternatives
 
-* Another proposal was to create a network fork, and send all tokens either to address A for Build or B for Burn. However, this is more of a one-time solution as it cannot be reused for future votes.
+* Another proposal was to create a network fork, and send all tokens either to address A for Build or B for Burn. However, this is more of a one-time solution as it cannot be reused for future referenda.
 * Tokens could also be locked for a few days to prevent flash-loan attacks. However, this would turn away possible voters.
 * The referendum could check for how long the tokens have not been moved and attribute voting power based on this time. However, this would turn away voters that constantly use IOTA, even if the tokens mostly stay in someones wallet.
 
