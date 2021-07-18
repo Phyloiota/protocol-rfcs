@@ -28,7 +28,7 @@ A referendum has 4 different stats
 
 ### Upcomming
 
-Any referendum will start here. The question and all answer options are set and final. Also, the start of the referendum, the start of the staking phase and the end of the referendum are set. Each referendum has a unique 256-bit hash as a unique identifier, which can be used to share the vote.
+Any referendum will start here. The question and all answer options are set and final. Also, the start of the referendum, the start of the holding phase and the end of the referendum are set. Each referendum has a unique 256-bit hash as a unique identifier, which can be used to share the vote.
 
 Referenda are neither automatically added to all nodes, nor are they broadcasted on the network. Instead, any node might give its users (or the owner only) the option to manually add referenda to track. Therefore the creation of a referendum should set the voting start at least a few days into the future and make sure there are enough nodes that tally up the votes. Referenda can only be added to nodes during this phase.
 
@@ -40,13 +40,13 @@ Whatever time is set as the beginning, there will always be a place where it wil
 
 Any votes for a referendum that is still upcoming or unknown to the node are ignored. This does not cause validation to fail. For example, if someone votes for 3 referenda at once but only one is known to the node, it will count the vote normally for one and ignore the other two.
 
-### Staking
+### Holding
 
-After the commencing phase is over, the staking phase will begin. Every time a milestone comes in, the node will first update the number of tokens voting for each option (if necessary) and then add this amount to the total count for each option. The addition will first happen one milestone after this phase begins, as we always credit for the duration between two milestones. The last addition happens at the end milestone, attributing weight for the last period.
+After the commencing phase is over, the holding phase will begin. Every time a milestone comes in, the node will first update the number of tokens voting for each option (if necessary) and then add this amount to the total count for each option. The addition will first happen one milestone after this phase begins, as we always credit for the duration between two milestones. The last addition happens at the end milestone, attributing weight for the last period.
 
-This adds a time factor to the vote. If you buy tokens and vote while the referendum is ongoing, you only get weight for the remaining time. Similiar, if you decide to sell, you will miss out on the weight for the remaining time. If you decide to change your opinion, your old opinion will get the weight of the elapsed time since the staking phase started, while your new opinion will get the weight of the remaining time.
+This adds a time factor to the vote. If you buy tokens and vote while the referendum is ongoing, you only get weight for the remaining time. Similiar, if you decide to sell, you will miss out on the weight for the remaining time. If you decide to change your opinion, your old opinion will get the weight of the elapsed time since the holding phase started, while your new opinion will get the weight of the remaining time.
 
-Example: Assume Alice has 2i and does not vote at all. Now she sends their tokens to Bob 10000 milestones after the beginning of the staking period (approx. 1d 4h). Bob instantly votes for option A. After another 20000 milestones have passed, he sends the tokens to Charlie, who instantly votes option B. 5000 Milestones later, the referendum ends. Assuming the total supply consists of 2 iotas the outcome would be:
+Example: Assume Alice has 2i and does not vote at all. Now she sends their tokens to Bob 10000 milestones after the beginning of the holding period (approx. 1d 4h). Bob instantly votes for option A. After another 20000 milestones have passed, he sends the tokens to Charlie, who instantly votes option B. 5000 Milestones later, the referendum ends. Assuming the total supply consists of 2 iotas the outcome would be:
 *     2i*10000=20000 are not counted in the voting
 *     2i*20000=40000 for Build (80%)
 *     2i* 5000=10000 for Burn (20%)
@@ -60,7 +60,7 @@ Once the end milestone has been received and the total counters have been update
 
 ## Referendum format
 
-Users can submit votes to any nodes that allow it. A referendum consists out of the question and multiple options to choose from, as well as 3 milestones, where the referendum starts, when staking starts and when it is over. There is also a number on how many options may be chosen, which allows multiple-choice votes if >1. Last but not least there is a description field that might contain additional data
+Users can submit votes to any nodes that allow it. A referendum consists out of the question and multiple options to choose from, as well as 3 milestones, where the referendum starts, when holding starts and when it is over. There is also a number on how many options may be chosen, which allows multiple-choice votes if >1. Last but not least there is a description field that might contain additional data
 
 ### Detailed format
 
@@ -94,10 +94,10 @@ Users can submit votes to any nodes that allow it. A referendum consists out of 
     </tr>
       </tr>
       <tr>
-        <td>Stake Milestone</td>
+        <td>Holding Milestone</td>
         <td>uint32</td>
         <td>
-        The milestone where the referendum enters staking
+        The milestone where the referendum enters holding phase
         </td>
     </tr>
     </tr>
@@ -132,7 +132,7 @@ Users can submit votes to any nodes that allow it. A referendum consists out of 
                         <td>Option ID</td>
                         <td>uint8</td>
                         <td>
-                        The ID of the option. Counted from 0 to 19.
+                        The ID of the option. Counted from 1 to 20.
                         </td>
                     </tr>
                     <tr>
@@ -185,8 +185,8 @@ Users can submit votes to any nodes that allow it. A referendum consists out of 
   * Options must be ordered ascending by their IDs
 * All options together must not exceed 1000 bytes
 * The referendum must start in 1 ≤ x ≤ 600000 milestones (~10 weeks)
-* The staking period has to start 360 ≤ x ≤ 600000 milestones after the referendum started
-* The referendum has to end 360 ≤ x ≤ 600000 milestones after staking started
+* The holding period has to start 360 ≤ x ≤ 600000 milestones after the referendum started
+* The referendum has to end 360 ≤ x ≤ 600000 milestones after holding started
 * The number of options to be chosen at once must be ≤ the total option count
 * The additional information field must not exceed 1000 bytes and is the only field that might be empty
 
@@ -262,7 +262,7 @@ Voting data will be sent via the indexation payload of a value transaction. To v
 
 ### Syntactic validation
 
-If parsing of the data fails, the transaction is ignored for voting. The limit for the number of votes within a singular transaction is 65536, but the message size limit will be hit way beforehand.
+If parsing of the data fails, the transaction is ignored for voting. The limit for the number of votes within a singular transaction is 65535, but the message size limit will be hit way beforehand.
 
 Validation of a singular vote passes, if
 
@@ -276,17 +276,26 @@ If a singular vote fails, others are unaffected. For example, if one vote is for
 
 ## Node endpoints
 
-To be added
+<i>This is more of a quick overview. A more detailed version is in work</i>
+
+* GET /votes/ : Lists all votes, returning their UUID, the question and status. Status `(upcomming,commencing,holding,ended)` can be optionally used as a filter
+* GET /votes/{VoteID} : Gets full detail for a vote, including up to date vote data.
+* POST /votes/ : Submit a vote to track. By default not reachable from outside
+* DELETE /votes/{VoteID}: Removes a tracked vote.
 
 # Drawbacks
 
-To vote, you always have to send tokens to yourself, so every time you receive tokens, you have to send them to yourself again.
-It is also technically possible to have different votes for different UTXOs on a single address.
+* To vote, you always have to send tokens to yourself, so every time you receive tokens, you have to send them to yourself again. It is also technically possible to have different votes for different UTXOs on a single address.
+* The standard vote length would be 8 (Index) +2 (Header) +32 (ID) +1 (Option length) +1 (option) = 44 additional bytes, which is rather long and might therefore increase the POW requirement for the transaction
+* If someone has multiple adresses, they could be linked together if he casted a vote for all addresses at the same time. Firefly should probably have some sort of sort of delay to prevent this.
 
 # Rationale and alternatives
 
-To be added
+* Another proposal was to create a network fork, and send all tokens either to adress A for Build or B for Burn. However, this is more of a one-time solution as it cannot be reused for future votes.
+* Tokens could also be locked for a few days to prevent flash-loan attacks. However, this would turn away possible voters.
+* The referendum could check for how long the tokens have not been moved and attribute voting power based on this time. However, this would turn away voters that constantly use IOTA, even if the tokens mostly stay in someones wallet.
 
 # Unresolved questions
 
-To be added
+* Some of the limits chosen for this proposal are kind of arbitrary. Might still need some work.
+* Do we need additional endpoints?
