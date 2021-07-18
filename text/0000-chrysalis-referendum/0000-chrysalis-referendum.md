@@ -8,16 +8,16 @@ This RFC defines ontangle voting for Chrysalis Phase 2. Specifically, it describ
 
 # Motivation
 
-With IF offering the community to decide the fortune of the unclaimed tokens <link to blogpost>, IOTA needs to provide a system for community members to create and vote on referenda. In community calls, we figured out that the only way to archive a fair referendum without having to invest years in R&D would be a simple token-based system. With this, any token holders can use their tokens to vote for one of the options, one token, one vote. Based on an online poll, the majority of the community wants to continue having community referenda. Therefore the system also needs to support future referenda, as well as multiple at the same time.
+Due to the IOTA Foundation offering the community to decide the fortune of the unclaimed tokens <link to blogpost>, IOTA needs to provide a system for community members to create and vote on referenda. In community calls, we figured out that the only way to archive a fair referendum without having to invest years in R&D would be a simple token-based system. With this, any token holders can use their tokens to vote for one of the options, one token, one vote. During the weekly meetings, the majority of the community agreed to have further ongoing community referenda to establish a system and decide on the features of this system through voting. Therefore the system also needs to support future referenda, as well as multiple at the same time.
 
 The described system tries to address the following points:
 
-* No protocol fork required, as voting data is stored in the data (indexation) payload of a value transaction
-* Protection against flash loan attacks, where an attacker buys a lot of tokens to game referenda and dump them instantly when it's over.
+* No protocol fork is required as voting data is stored in the data (indexation) payload of a value transaction
+* Protection against flash loan attacks, where an attacker buys a lot of tokens to game referenda and dumps them instantly after the referenda
   * This is archived by adding a third factor to voting weight, which is holding time
 * No token locking required
 * Optional multiple-choice vote (choose n out of m options)
-* Tokens stay in your wallet at all time
+* Tokens remain in your wallet at all time
 
 
 # Detailed design
@@ -30,7 +30,7 @@ A referendum has 4 different stats
 
 Any referendum will start here. The question and all answer options are set and final. Also, the start of the referendum, the start of the holding phase and the end of the referendum are set. Each referendum has a unique 256-bit hash as a unique identifier, which can be used to share the vote.
 
-Referenda are neither automatically added to all nodes, nor are they broadcasted on the network. Instead, any node might give its users (or the owner only) the option to manually add referenda to track. Therefore the creation of a referendum should set the voting start at least a few days into the future and make sure there are enough nodes that tally up the votes. Referenda can only be added to nodes during this phase.
+Referenda are neither automatically added to all nodes, nor are they broadcasted on the network. Instead, any node might give its users (or the owner only) the option to manually add referenda to track. Therefore the creation of a referendum should set the start of a vote at least a few days into the future and make sure there are enough nodes that tally up the votes. Referenda can only be added to nodes during this phase.
 
 ### Commencing
 
@@ -56,7 +56,7 @@ In reality, those numbers would be a lot higher, enough to exceed the 64-bit int
 
 ### Ended
 
-Once the end milestone has been received and the total counters have been updated a final time, the referendum is over. New votes are ignored, just as if the node did not know the referendum at all. 
+Once the end milestone has been received and the total counters have been updated a last time, the referendum is over. New votes are ignored, just as if the node did not know the referendum at all. 
 
 ## Referendum format
 
@@ -287,11 +287,11 @@ If a singular vote fails, others are unaffected. For example, if one vote is for
 
 * To vote, you always have to send tokens to yourself, so every time you receive tokens, you have to send them to yourself again. It is also technically possible to have different votes for different UTXOs on a single address.
 * The standard vote length would be 8 (Index) +2 (Header) +32 (ID) +1 (Option length) +1 (option) = 44 additional bytes, which is rather long and might therefore increase the POW requirement for the transaction
-* If someone has multiple adresses, they could be linked together if he casted a vote for all addresses at the same time. Firefly should probably have some sort of sort of delay to prevent this.
+* If someone has multiple addresses, they could be linked together if he cast a vote for all addresses at the same time. Firefly should probably have some sort of delay to prevent this.
 
 # Rationale and alternatives
 
-* Another proposal was to create a network fork, and send all tokens either to adress A for Build or B for Burn. However, this is more of a one-time solution as it cannot be reused for future votes.
+* Another proposal was to create a network fork, and send all tokens either to address A for Build or B for Burn. However, this is more of a one-time solution as it cannot be reused for future votes.
 * Tokens could also be locked for a few days to prevent flash-loan attacks. However, this would turn away possible voters.
 * The referendum could check for how long the tokens have not been moved and attribute voting power based on this time. However, this would turn away voters that constantly use IOTA, even if the tokens mostly stay in someones wallet.
 
