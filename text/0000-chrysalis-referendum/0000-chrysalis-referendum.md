@@ -246,6 +246,7 @@ Users can submit referenda to any nodes that have the endpoint open. A referendu
 
 ### Syntactical validation
 
+* The entire object must not exceed 1 million bytes
 * The referendum must start in 1 ≤ x ≤ 600000 milestones (~10 weeks)
 * The holding period has to start 360 ≤ x ≤ 600000 milestones after the referendum started
 * The referendum has to end 360 ≤ x ≤ 600000 milestones after holding started
